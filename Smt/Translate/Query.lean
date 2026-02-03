@@ -249,6 +249,7 @@ def emitVertex (cmds : Std.HashMap Expr Command) (e : Expr) : StateT (List Comma
   set (← addCommand cmd (← get))
 
 def generateQuery (goal : Expr) (hs : List Expr) (fvNames : Std.HashMap FVarId String) : MetaM (List Command) :=
+  withTraceNode `smt.perf.translate (fun _ => return "generateQuery") do
   withTraceNode `smt.translate.query (fun _ => pure .nil) do
     trace[smt.translate.query] "Goal: {← inferType goal}"
     trace[smt.translate.query] "Provided Hints: {hs}"

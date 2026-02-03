@@ -26,7 +26,9 @@ def hasReturnType (e : Expr) (p : Expr → Bool) : Bool :=
   | .forallE _ _ b _ => hasReturnType b p
   | _                => p e
 
-def embedding (mv : MVarId) (hs : Array Expr) : MetaM Result := mv.withContext do
+def embedding (mv : MVarId) (hs : Array Expr) : MetaM Result :=
+  withTraceNode (`smt.perf.preprocess ++ `embedding) (fun _ => return "embedding") do
+  mv.withContext do
   -- Find all free vars to revert in `hs` and `mv`.
   let ts ← hs.mapM Meta.inferType
   let ⟨_, _, fvs⟩ := (ts.push (← mv.getType)).foldl Lean.collectFVars {}

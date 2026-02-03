@@ -12,7 +12,8 @@ namespace Smt.Preprocess
 
 open Lean
 
-def pushHintsToCtx (mv : MVarId) (hs : Array Expr) : MetaM Result := do
+def pushHintsToCtx (mv : MVarId) (hs : Array Expr) : MetaM Result :=
+  withTraceNode (`smt.perf.preprocess ++ `pushHintsToCtx) (fun _ => return "pushHintsToCtx") do
   hs.foldrM pushHint { map := {}, hs := #[], mv }
 where
   pushHint (h : Expr) (r : Result) : MetaM Result := do

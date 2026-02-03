@@ -112,6 +112,16 @@ def withScopedName (n : Name) (b : Expr) (k : Name → TranslationM α) : Transl
   set state
   k
 
+/-- Try all translators on `e`, returning the first successful translation.
+    TODO: Use `DiscrTree` to index the translators instead of naively looping. -/
+def tryTranslators (ts : List (Translator × Name)) (e : Expr) : TranslationM (Option Term) :=
+  withTraceNode `smt.perf.translate.lookup (fun _ => return m!"lookup {e}") do
+    ts.findSomeM? fun (t, nm) => do
+      if let some tm ← t e then
+        trace[smt.translate.expr] "{e} =({nm})=> {tm}"
+        return some tm
+      return none
+
 mutual
 
 /-- Like `applyTranslators?` but must succeed. -/
@@ -129,11 +139,8 @@ partial def applyTranslators? : Translator := withCache fun e => do
   where
     go (ts : List (Translator × Name)) : Translator := fun e => do
       -- First try all translators on the whole expression
-      -- TODO: Use `DiscrTree` to index the translators instead of naively looping
-      for (t, nm) in ts do
-        if let some tm ← t e then
-          trace[smt.translate.expr] "{e} =({nm})=> {tm}"
-          return tm
+      if let some tm ← tryTranslators ts e then
+        return tm
 
       -- Then try splitting subexpressions
       match e with

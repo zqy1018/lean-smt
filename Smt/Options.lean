@@ -23,5 +23,12 @@ initialize
   registerTraceClass `smt.reconstruct.sort
   registerTraceClass `smt.reconstruct.term
   registerTraceClass `smt.reconstruct.proof
+  registerTraceClass `smt.perf (inherited := true)
+  registerTraceClass `smt.perf.preprocess
+  registerTraceClass `smt.perf.translate (inherited := true)
+  registerTraceClass `smt.perf.translate.lookup
+  registerTraceClass `smt.perf.solve
+  registerTraceClass `smt.perf.reconstruct
+  registerTraceClass `smt.perf.minimize
 
 end Smt

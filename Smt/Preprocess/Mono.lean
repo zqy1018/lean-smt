@@ -222,7 +222,8 @@ where
       modify fun s => s.insertMany names
     | _ => return
 
-def mono (mv : MVarId) (hs : Array Expr) : MetaM Result := do
+def mono (mv : MVarId) (hs : Array Expr) : MetaM Result :=
+  withTraceNode (`smt.perf.preprocess ++ `mono) (fun _ => return "mono") do
   let (invMap, hints, unfoldInfos, defeqNames) ← hintsToAutoHints hs
   let (mv, fvs, dtrs) ← Auto.mono' `smt mv hints unfoldInfos defeqNames
   let map := fvs.foldl (init := {}) fun map (fv, e) =>
