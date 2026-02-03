@@ -43,8 +43,9 @@ def getFVarOrConstExpr! (n : String) : ReconstructM Expr := do
     let s := t.toString
     let endPos := (s.rawEndPos - t.getSort.toString).decreaseBy 2
     let endPos := if endPos.dec.get? s == some '|' then endPos.dec else endPos
-    let startPos := (s.revFindAux (· != '_') endPos).get!
-    let i : Nat := (String.Pos.Raw.extract s startPos endPos).toNat!
+    let endPos := s.pos! endPos
+    let startPos := (String.Pos.revFind? endPos (· != '_')).get!
+    let i : Nat := (String.extract startPos endPos).toNat!
     if h : i < n then
       let i : Fin n := ⟨i, h⟩
       return toExpr i
